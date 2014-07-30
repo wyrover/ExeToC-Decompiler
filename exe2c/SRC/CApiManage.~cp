@@ -1,0 +1,71 @@
+//	CApiManage.cpp
+#include "stdafx.h"
+#include "cisc.h"
+#include "cexe3c.h"
+
+CApiManage* g_ApiManage = NULL;
+
+class CApiManage_cpp
+{
+public:
+	CApiManage_cpp();
+	~CApiManage_cpp(){}
+};
+
+CApiManage_cpp self;
+
+CApiManage_cpp::CApiManage_cpp()
+{
+	g_ApiManage = new CApiManage;   //new_CApiManage
+}
+//	--------------------------------------------------
+
+
+bool CApiManage::new_api(ea_t address,int stacksub)
+{
+	CApi *p = new CApi;     //new_CApi
+	p->address = address;
+	p->m_stack_purge = stacksub;
+	
+	sprintf(p->name,"api_%x",address);
+    
+	this->apilist->AddHead(p);
+	return true;
+}
+CApi*	CApiManage::get_api(ea_t address)
+{
+    DWORD ptr = (DWORD)ea2ptr(address);
+	POSITION pos = this->apilist->GetHeadPosition();
+	while (pos)
+	{
+		CApi* p = this->apilist->GetNext(pos);
+		if (p->address == ptr)
+		{
+			return p;
+		}
+	}
+	return NULL;
+}
+
+void CApiManage::New_ImportAPI(PCSTR pstr, DWORD apiaddr)
+{
+    //注意这时的apiaddr实际上是个ptr而不是ea_t
+    //因为这时ea2ptr函数还不能正常工作
+    if (!stricmp(pstr, "RegisterClassExA"))
+        log_prtl("New_ImportAPI %s 0x%x", pstr, apiaddr);
+#if 0
+    st_FuncDefine* pf = NULL;   //g_FuncDefineMng.SearchAPI(pstr);
+	if (pf == NULL)
+		return;
+	CApi *p = new CApi;     //new_CApi
+	p->address = apiaddr;
+    assert(pf);
+    p->m_rettype = pf->pRetType;
+    p->m_paratype = pf->pParaType;
+	p->m_stack_purge = pf->GetStackPurge(); //g_FuncDefineMng.API_stack(pstr);
+	
+	strcpy(p->name, pstr);
+    
+	this->apilist->AddHead(p);
+#endif
+}

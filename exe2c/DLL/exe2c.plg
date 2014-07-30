@@ -1,0 +1,159 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: exe2c - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x409 /fo"Release/exe2c_DLL.res" /d "NDEBUG" /d "_AFXDLL" "E:\work\work1_exe2c\exe2c_src\exe2c\DLL\exe2c_DLL.rc"" 
+Creating temporary file "D:\DOCUME~1\lewton1\LOCALS~1\Temp\RSP1C2.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /Fp"Release/exe2c.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\work\work1_exe2c\exe2c_src\exe2c\DLL\exe2c_DLL.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CLibScanner.CPP"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\analysis.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CApiManage.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CCbuf.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CClassManage.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CCodeList.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CEnumMng.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\Cexe2c.CPP"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CExprManage.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CFunc.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CFunc_CreateInstrList.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CFuncOptim.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CFuncPrt.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CFuncStep1.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CFuncType.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CMyString.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CNameID.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\ComplexInstr.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CStrategy.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CXmlList.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\CXmlPrt.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\DataType.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\Deasm_Init.CPP"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\Disasm.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\DLL32DEF.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\exe2c.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\FileLoad.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\hpp.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\INSTR.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\main.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\optim.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\PEload.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\PUB.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\standard.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\strparse.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\SVarType.cpp"
+"E:\work\work1_exe2c\exe2c_src\exe2c\SRC\XmlType.cpp"
+]
+Creating command line "cl.exe @D:\DOCUME~1\lewton1\LOCALS~1\Temp\RSP1C2.tmp" 
+Creating temporary file "D:\DOCUME~1\lewton1\LOCALS~1\Temp\RSP1C3.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_WINDLL" /D "_AFXDLL" /D "_MBCS" /D "_USRDLL" /Fp"Release/exe2c.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\work\work1_exe2c\exe2c_src\exe2c\DLL\StdAfx.cpp"
+]
+Creating command line "cl.exe @D:\DOCUME~1\lewton1\LOCALS~1\Temp\RSP1C3.tmp" 
+Creating temporary file "D:\DOCUME~1\lewton1\LOCALS~1\Temp\RSP1C4.tmp" with contents
+[
+/nologo /subsystem:windows /dll /incremental:no /pdb:"Release/exe2c.pdb" /machine:I386 /def:".\exe2c.def" /out:"../../BIN/exe2c.dll" /implib:"Release/exe2c.lib" 
+.\Release\exe2c_DLL.obj
+.\Release\StdAfx.obj
+.\Release\CLibScanner.obj
+.\Release\analysis.obj
+.\Release\CApiManage.obj
+.\Release\CCbuf.obj
+.\Release\CClassManage.obj
+.\Release\CCodeList.obj
+.\Release\CEnumMng.obj
+.\Release\Cexe2c.obj
+.\Release\CExprManage.obj
+.\Release\CFunc.obj
+.\Release\CFunc_CreateInstrList.obj
+.\Release\CFuncOptim.obj
+.\Release\CFuncPrt.obj
+.\Release\CFuncStep1.obj
+.\Release\CFuncType.obj
+.\Release\CMyString.obj
+.\Release\CNameID.obj
+.\Release\ComplexInstr.obj
+.\Release\CStrategy.obj
+.\Release\CXmlList.obj
+.\Release\CXmlPrt.obj
+.\Release\DataType.obj
+.\Release\Deasm_Init.obj
+.\Release\Disasm.obj
+.\Release\DLL32DEF.obj
+.\Release\exe2c.obj
+.\Release\FileLoad.obj
+.\Release\hpp.obj
+.\Release\INSTR.obj
+.\Release\main.obj
+.\Release\optim.obj
+.\Release\PEload.obj
+.\Release\PUB.obj
+.\Release\standard.obj
+.\Release\strparse.obj
+.\Release\SVarType.obj
+.\Release\XmlType.obj
+.\Release\exe2c_DLL.res
+]
+Creating command line "link.exe @D:\DOCUME~1\lewton1\LOCALS~1\Temp\RSP1C4.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+exe2c_DLL.cpp
+CLibScanner.CPP
+analysis.cpp
+CApiManage.cpp
+CCbuf.cpp
+CClassManage.cpp
+CCodeList.cpp
+CEnumMng.cpp
+Cexe2c.CPP
+CExprManage.cpp
+CFunc.cpp
+CFunc_CreateInstrList.cpp
+CFuncOptim.cpp
+CFuncPrt.cpp
+CFuncStep1.cpp
+CFuncType.cpp
+CMyString.cpp
+CNameID.cpp
+ComplexInstr.cpp
+CStrategy.cpp
+Generating Code...
+Compiling...
+CXmlList.cpp
+CXmlPrt.cpp
+DataType.cpp
+Deasm_Init.CPP
+Disasm.cpp
+DLL32DEF.cpp
+exe2c.cpp
+FileLoad.cpp
+hpp.cpp
+INSTR.cpp
+main.cpp
+optim.cpp
+PEload.cpp
+PUB.cpp
+standard.cpp
+strparse.cpp
+SVarType.cpp
+XmlType.cpp
+Generating Code...
+Linking...
+   Creating library Release/exe2c.lib and object Release/exe2c.exp
+
+
+
+<h3>Results</h3>
+exe2c.dll - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

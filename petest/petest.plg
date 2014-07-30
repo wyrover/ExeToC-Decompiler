@@ -1,0 +1,43 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: petest - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "D:\DOCUME~1\lewton1\LOCALS~1\Temp\RSP19C.tmp" with contents
+[
+/nologo /ML /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /Fp"Release/petest.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\work\work1_exe2c\exe2c_src\petest\petest.cpp"
+]
+Creating command line "cl.exe @D:\DOCUME~1\lewton1\LOCALS~1\Temp\RSP19C.tmp" 
+Creating temporary file "D:\DOCUME~1\lewton1\LOCALS~1\Temp\RSP19D.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /subsystem:windows /incremental:no /pdb:"Release/petest.pdb" /machine:I386 /out:"E:\work\work1_exe2c\exe2c_test\petest.exe" 
+.\Release\petest.obj
+.\Release\StdAfx.obj
+.\Release\test_class.obj
+.\Release\petest.res
+]
+Creating command line "link.exe @D:\DOCUME~1\lewton1\LOCALS~1\Temp\RSP19D.tmp"
+<h3>Output Window</h3>
+Compiling...
+petest.cpp
+Linking...
+Microsoft (R) Incremental Linker Version 6.00.8447
+Copyright (C) Microsoft Corp 1992-1998. All rights reserved.
+
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /subsystem:windows /incremental:no "/pdb:Release/petest.pdb" /machine:I386 "/out:E:\work\work1_exe2c\exe2c_test\petest.exe" 
+.\Release\petest.obj 
+.\Release\StdAfx.obj 
+.\Release\test_class.obj 
+.\Release\petest.res 
+
+
+
+<h3>Results</h3>
+petest.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

@@ -1,0 +1,599 @@
+2005.2.5 4:20 新的思想：每一次的优化都要能看到见，比如变量优化
+要把当前变量的使用树显示出来，然后告诉我这次优化要用什么策略，
+为什么。
+
+基本一个变量优化：
+首先只考虑寄存器变量。
+对整个函数过一遍，保留jmp和label和return，其它与本变量无关的语句去掉。
+然后把空的jmp和label去掉。这时剩下的部分可以打印出来给用户看了。
+
+堆栈变量是函数一开始就sub esp, nn，留出空间，在整个函数中每一个量有
+固定的意义，一般不变。而，再遇到call，需要把参数一个个push入栈，这时
+候的栈里的东西是临时的，显然不能看作堆栈变量。它不是永久的。说不定再
+次使用这个空间时，会有另一层意思。所以函数结束后，要加一个虚拟语句，
+指示前面所用的临时变量失效。
+
+这些是有符号的。
+case JMP_jl:
+case JMP_jg:
+case JMP_jle:
+case JMP_jge:
+判断变量有无符号不是exe2c的重点，这部分代码暂删
+
+			case JMP_jge:
+
+-------------
+要把类似IDA的分析过程和EXE2C的过程明确分开
+-------------
+2005.2.15 现在的问题：我对jmp和label的流程分析是在高级阶段做的。而要
+把ASM按IDA输出，需要把它移到ASM一级去。
+
+原则：在低端能做的事情，不要到高端去做
+
+为了简化复杂逻辑的分析，我把cmp和jxx合为一条指令。但这又增加了流程分析的
+难度。
+
+规范的for应该先做条件判断。但for (int i = 0; i<10; i++)优化后可以把第
+一次的判断去掉。这时要把它判断为for就比较困难。这时它会被判断为do-while
+
+命令:
+funcpara 4 4 4
+表明当前函数有3个参数
+
+函数是一个instrlist，每一个instr中包括它用到的变量var_w,var_r1,var_r2，
+有一个函数（？），遍历instrlist，根据每一个instr中的var，生成变量表。这个
+过程只进行一次。新生成的变量叫M_T。也就是说，一个M_T对应于多个instr中的
+多个var。它们之间的关联显然应该是var中有一个指针，指向它对应的M_T。如果
+M_T发生变化，比如删除或合并，则需要遍历instrlist同步这种变化。
+
+对于push/pop产生的临时变量，可以在它pop后，给M_T_list发一条消息，说明某
+些temvar不会再被引用。
+
+加一个特征注解
+//SuperC_func: 只在＜＞中使用
+//SuperC_var: 只在＜＞中使用
+
+遇到一个call，一般会形成如下形状：
+i_Call
+i_CallPara
+i_CallRet
+输出的时候，可以这么处理。遇到i_Call，往后找i_CallRet，如果找到了，就显示
+eax = ?;然后i_CallRet就不需要显示了。
+
+不认识这条指令：
+0F AF C0 imul eax, eax
+
+问题，对于一个21E，也就是“写－－读－－End”，优化方法当然是把这个变量变成
+临时变量。但，这种优化总是进行吗？
+
+数据类型，显然从函数定义中获得的数据类型是比较可靠的。但在给一个变量数据类型
+前，我们需要“变量分离”。比如一个寄存器ecx在一个函数中有多次使用，每次之间
+并无联系，我们就不能认为它是一个变量，而应该分为ecx1,ecx2,ecx3等等。变量分离
+以后，才好给它们加数据类型。
+
+IDA是成功的。它的分析模式简单，每一步都是可逆的。一段代码，用户可以U掉，还可
+以D成数据，后来又发现它是代码，还可以C回来，如此多次也不会损失任何信息。exe2c
+就麻烦多了。比如：
+           call func1
+           ret
+如果认为当前函数没有返回值，写成
+        func1();
+        return;
+后来用户又发现它是有返回值的，就很难改回来。还有函数的参数等，都有这个问题。
+因为，exe2c的分析过程是不可逆的。
+
+
+input edi
+xor eax, eax
+or ecx, -1
+repnz scasb
+not ecx
+dec ecx
+mov eax, ecx
+----------
+edi = ?
+eax = 0
+ecx = -1
+??? repnz scasb
+ecx = ?(ecx)
+ecx = ecx -1
+mov eax, ecx
+-----------
+edi = ?
+eax = 0
+ecx = -1
+unknow(write ecx, edi read al, edi[])
+ecx = ?(ecx)
+ecx = ecx -1
+mov eax, ecx
+------
+edi = ?
+eax = 0
+ecx = -1
+unknow
+{
+    read_write ecx
+    read_write edi
+    read edi[]
+    read al
+}
+
+ecx = ?(ecx)
+ecx = ecx -1
+mov eax, ecx
+------
+edi = ?
+unknow
+{
+    read_write edi
+    read edi[]
+    write ecx
+    write eax
+}
+mov eax, ecx
+-----------
+edi = ?
+unknow
+{
+    read edi
+    write ecx
+}
+mov eax, ecx
+-----------
+edi = ?
+ecx = unknown_math(edi);
+mov eax, ecx
+-----------
+edi = ?
+eax = 0
+eax = unknown_math(edi, al);
+
+所有的分析都可以分为两类，一类是只能运行一遍的，一类是可以重复运行的。
+可以用两个函数指针数组。第一个叫tblProgressAna，意思是进度分析。分析
+进行到哪一步，要记下来，叫m_nStep。如果全部都通过了，就置m_nStep=100.
+可以进行下一系列的分析了。
+第二个叫tblRepeatAna，可以循环调用的。如果一个函数return true，就反复
+调用它，直到它return false才调用下一个。直到所有表中的函数都调用完了，
+OK，分析结束。
+
+=============================文章开始================================
+2005.4.8
+序，意义
+        提高公司知名度。
+        吸引人才，获得政府支持，吸引客户。
+序，可行性
+        现DLL有18k行代码。
+1.反汇编
+把机器码反汇编为可读的汇编指令，把90h变为nop，这个过程叫反汇编。反汇编
+的过程用得很多，可以在很多debugger，分析器中找到。容易理解，exetoc的第
+一步，肯定也是反汇编。这是所有后续分析的基础。
+但是，exetoc的反汇编与通常意义上的反汇编是不同的，它不仅仅是把机器码转
+化为汇编指令就可以了，它要求更多，它要区分是add还是sub，有几个操作数。
+简单地讲，传统的反汇编的输出结果是一行字串，而exetoc的要求，输出结果是
+一个类似如下的结构：
+
+enum OP_TYPE
+{
+	OP_Invalid	=	0,
+	OP_Address	=	1,
+	OP_Register	=	2,
+	OP_Segment	=	3,
+	OP_Immed	=	4,
+};
+
+
+typedef struct OPERITEM
+{
+	OP_TYPE mode;		//OP_Register, ...
+	BYTE    rwflag;		//0:Unknown	1:Read 2:Write 3:Access
+	BYTE    opersize;	//1:BYTE, 2:WORD, 4:DWORD, 8:double DWORD
+	union
+	{
+		struct
+		{
+			BYTE    seg_index;	//SegReg Index!!!
+			//BYTE    reg_size;	//2:WORD 4:DWORD
+			BYTE    base_reg_index;
+			BYTE    off_reg_index;
+			BYTE    off_reg_scale;
+			DWORD   off_value;
+		}   addr;		//for Mode 1:Address
+		struct
+		{
+			DWORD   reg_index;
+		}   reg;		//for Mode 2:Register	
+		struct
+		{
+			DWORD   sreg_index;
+		}   sreg;		//for Mode 3:Segment Register	
+		struct
+		{
+			DWORD   immed_value;
+		}   immed;		//for Mode 4:Immed
+	};
+} *POPERITEM;
+enum OPCODETYPE
+{
+	C_ADD,
+	C_OR,
+	C_ADC,
+	C_SBB,
+	C_AND,
+	C_SUB,
+	C_XOR,
+	C_CMP,
+        ...,
+}
+
+typedef struct XCPUCODE
+{
+	OPCODETYPE        opcode;		//	C_MOV...
+	BYTE        lockflag;	// for LOCK prefix
+	BYTE        repeatflag;	// for REPZ/REPNZ prefix
+	OPERITEM    op[3];
+
+} *PXCPUCODE;
+
+这个XCPUCODE结构实际上是每一条指令的一种结构表达形式，这种结构表达方式
+才可以被后续的分析使用。
+
+2.内部伪码
+以上的XCPUCODE结构与Intel的X86指令集是一一结应关系，即每一条X86指令，都
+可以有一个对应的XCPUCODE结构来表达。但是，这种结构也是不方便进行分析的。
+比如一条指令
+        mov eax, [ebx+ecx*4+1000]
+对应的结构太复杂，不方便分析，有必要创造一种中间的伪码来方便后续的分析。
+这种伪码要很简单，读写关系明确。如下结构：
+enum HLType
+{
+	i_Jump	=	0x101,
+	i_Label =	0x102,
+	i_Begin	,
+	i_End	,
+	i_Assign,
+	i_Var	,
+	i_Add, i_Sub, i_Xor, i_Sar, i_And, i_Shl, i_Shr, i_Imul,
+	i_Readpointto,
+	i_Writepointto,
+	i_GetAddr,
+	i_Call,
+	i_CallApi,
+	i_CallPara,
+	i_CallRet,
+	i_CplxBegin,
+	i_CplxEnd,
+	i_Nop,
+
+        ...,
+};
+class INSTR
+{
+public:
+	HLType	type;	//	i_Assign ...
+    union
+	{
+		struct
+		{
+			JxxType	jmp_type;	//JMP_???
+			DWORD   jmpto_off;
+			PINSTR the_label;
+			PINSTR next_ref_of_this_label;	//这里组成个链，用来保存对一个label的所有ref
+		} jmp;					//for type = i_Jump only
+
+		struct
+		{
+			PINSTR  ref_instr;	//for type = i_Label only
+			ea_t	label_off;
+			bool	f_conti;
+		} label;
+
+		struct
+		{
+			CFunc*  call_func;		// for i_Call
+			CApi*	papi;			// for i_CallApi
+			signed int		esp_level;
+            PINSTR      p_callpara;
+            PINSTR      p_callret;
+		} call;
+
+	VAR		var_w;
+	VAR		var_r1;
+	VAR		var_r2;
+	DWORD	i1;	// =4, 当type == i_Address时，[eax+ebx*4+8888]
+	DWORD	i2;	// =8888
+};
+
+这个结构INSTR中明确了一条伪码可以有3个操作量，var_w是写操作数，var_r1和var_r2是两
+个读操作数。因为INSTR与XCPUCODE结构的不同，在从XCPUCODE到INSTR的转化中，可能会出
+现一条指令变成两条甚至多条的情况。比如
+        mov eax, [ebx+ecx*4+1000]
+会变成
+        i_GetAddr var_w=tem_1, var_r1=EBX, var_r2=ECX, i1=4, i2=1000
+        i_Readpointto var_w=eax, var_r1=tem_1
+会产生一个中间变量tem_1
+再比如
+        push eax
+会变成
+        i_Assign tem_1, eax
+        i_Sub    esp, 4
+
+3. 变量的优化
+变量优化是exetoc的主要技术点。
+3.1 取变量特征串
+以下代码是返回一条指令是如何使用一个变量的：
+    if (the->bJxx)
+        return 'J';
+
+    PINSTR pinstr = the->pinstr;
+    BYTE rw = the->rw;
+    if (pinstr->type == i_Label) return 'L';
+    if (pinstr->type == i_Return) return 'E';
+    if (pinstr->type == i_Assign)
+    {
+        if (rw == 1) return '5';    //Read
+        if (rw == 2) return '6';    //Write
+        if (rw == 3) return '7';    //Read and Write
+    }
+    else
+    {
+        if (rw == 1) return '1';    //Read
+        if (rw == 2) return '2';    //Write
+        if (rw == 3) return '3';    //Read and Write
+    }
+也就是说，由几个字母表示了指令对一个变量的使用方法，
+有"JLE567123"种可能。J代表一个跳转，L代表一个label即跳转目的，
+E代表函数结束，1读2写3是读写。5代表赋值给另外一个量，6代表把另一个
+量赋值给我。
+这样，一个函数中如何使用一个变量的，就用一个字串表示出来了。
+对字串的处理总是简单易懂的。
+
+实际的情况要复杂得多。这样直接得到的特征串常常意义不大。还需要简化。
+比如
+        2JL1E
+就是“写－跳－标－读－End”就可以简化为 21E
+再比如
+        ebx = 0
+        ? = ebx
+        while (?)
+        {
+           ebx = ?
+           ? = ebx
+        }
+        return
+对变量ebx来说，特征串是 65LJ65JLE
+容易理解这个特征串可以简化为 6565E
+
+
+
+
+3.2 根据变量特征串进行变量优化
+比如我们遇到了一个特征串是：
+        61E
+即一个变量被赋值，使用了一次，就结束了。则一般情况下，可以把它“消”
+掉，即直接使用赋值的源变量。
+
+3.3 根据变量特征串进行变量分离
+比如我们遇到了一个特征串是：
+        211211E
+显然这可以分为两个变量。
+分离变量是后面数据类型分析的基础。
+比如一个寄存器ecx在一个函数中有多次使用，每次之间
+并无联系，我们就不能认为它是一个变量，而应该分为ecx1,ecx2,ecx3等等。变量分离
+以后，才好给它们加数据类型。
+
+4. 标准C++头文件解析
+已经基本支持一般的头文件，支持//注解，/**/注解，#define,typedef,函数预定义,
+struct,enum,class等
+
+5. 标准库函数解析
+现在是读取vc的LIB文件，从中解析出一个个的标准函数，生成自己的标识文件。分析时
+进行全比较。要注意重定位项。
+
+6. 流程分析
+char finger_for[] 	= "0_jmp1_from2_0_from1_0_jxx3_0_jmp2_from3_";
+char finger_if [] 	= "0_jxx1_0_from1_";
+char finger_if_else[] = "0_jxx1_0_jmp2_from1_0_from2_";
+char finger_while[] 	= "from1_0_jxx2_0_jmp1_from2_";
+char finger_dowhile[] = "from1_0_jxx1_";
+
+7. 数据类型分析
+表示数据类型的结构：
+enum VarTT
+{
+    vtt_unknown = 0,
+        vtt_base	= 1,	//	是基类型，不依赖于其它类型
+        vtt_signed,			//	缺省为unsigned
+        vtt_typedef,
+        vtt_array,			//	数组
+        vtt_point,
+        vtt_class,          // 结构,或类
+        vtt_funcpoint,
+        vtt_const,			//	const
+        vtt_enum,
+    vtt_simple,         // 如果不知道是什么类型，就用这个
+                        //简单类型 对每一个size都会有一个简单类型，实际上未知类型。名叫bit8之类
+};
+
+struct SVarType
+{
+	VarTypeID	id;			//	如果谁需要这个结构，只要记下这个id就行了
+							//	通过这个id与 SVar 联系
+	VarTT	type;
+
+	union
+	{
+		struct
+		{
+			CFuncType*		pFuncType;		//	for vtt_funcpoint, if this is a func pointer
+		} m_funcpoint;						//	= 1 means unknown funcpoint
+		struct
+		{
+			char	classname[80];		//!!! only for unknown struc !
+			Class_st*		pClass;			//	if this is a class
+		} m_class;
+		struct
+		{
+			VarTypeID	id_pointto;	//	if this is a pointer
+		} m_point;
+		struct
+		{
+			SIZEOF	arraynum;		// 	if this is a array, this is item count
+			VarTypeID	id_arrayitem;	//	if this is a array, this is item id
+		} m_array;
+		struct
+		{
+			VarTypeID	id_base;	//	这个数据类型的基类
+			PSTR	name;
+		} m_typedef;
+		struct
+		{
+			VarTypeID	id_base;	//	这个数据类型的基类
+		} m_const;
+		struct
+		{
+			VarTypeID	id_base;	//	这个数据类型的基类
+			PSTR	name;
+		} m_signed;
+		struct
+		{
+			SIZEOF	opsize;
+			PSTR	name;
+		} m_base;					//	基类型
+        struct
+        {
+            SIZEOF  opsize;
+        } m_simple;
+		struct
+		{
+			char	enumname[80];
+			enum_st*	m_penum;
+		} m_enum;
+	};
+};
+注意其中的vtt_simple。每一个变量初始化的时候，都根据它的sizeof给它一个vtt_simple
+类型的数据类型。意思是它的数据类型为未知。如果在代码中遇到一个api call，则可以
+根据我们事先从标准头文件中得到的该api的函数预定义，获得它的各参数数据类型，及
+返回值数据类型。并由此类推，得到其它变量的数据类型。比如遇到一个
+        i_Assign B, A
+如果已经B的数据类型是HWND，而A的数据类型是vtt_simple，则可以放心地把A的数据类型
+也置为HWND.
+再比如，
+        i_ReadPointto B,A
+如果已经B的数据类型是char，而A的数据类型是vtt_simple，则可以放心地把A的数据类型
+也置为char*.
+
+typedef const char * PCSTR;
+
+
+8. 未知指令的处理（未实现）
+
+input edi
+xor eax, eax
+or ecx, -1
+repnz scasb
+not ecx
+dec ecx
+mov eax, ecx
+----------
+edi = ?
+eax = 0
+ecx = -1
+??? repnz scasb
+ecx = ?(ecx)
+ecx = ecx -1
+mov eax, ecx
+-----------
+edi = ?
+eax = 0
+ecx = -1
+unknow(write ecx, edi read al, edi[])
+ecx = ?(ecx)
+ecx = ecx -1
+mov eax, ecx
+------
+edi = ?
+eax = 0
+ecx = -1
+unknow
+{
+    read_write ecx
+    read_write edi
+    read edi[]
+    read al
+}
+
+ecx = ?(ecx)
+ecx = ecx -1
+mov eax, ecx
+------
+edi = ?
+unknow
+{
+    read_write edi
+    read edi[]
+    write ecx
+    write eax
+}
+mov eax, ecx
+-----------
+edi = ?
+unknow
+{
+    read edi
+    write ecx
+}
+mov eax, ecx
+-----------
+edi = ?
+ecx = unknown_math(edi);
+mov eax, ecx
+-----------
+
+9。实例:
+
+=============================文章结束================================
+
+
+PUSH   -01
+PUSH   00406CB8
+MOV    EAX,FS:[00000000]
+PUSH   EAX
+MOV    FS:[00000000],ESP
+SUB    ESP,+08
+...
+MOV    DWORD PTR [ESP+10],00000000
+...
+MOV    DWORD PTR [ESP+10],FFFFFFFF
+...
+MOV    ECX,[ESP+08]
+MOV    FS:[00000000],ECX
+ADD    ESP,+14
+RET
+-----------------------    
+PUSH   -01
+PUSH   00406CB8
+MOV    EAX,FS:[00000000]
+PUSH   EAX
+MOV    FS:[00000000],ESP
+...
+MOV    DWORD PTR [ESP+8],00000000
+...
+MOV    DWORD PTR [ESP+8],FFFFFFFF
+...
+MOV    ECX,[ESP]
+MOV    FS:[00000000],ECX
+ADD    ESP,+0c
+RET
+
+_EH_prolog
+CxxThrowException
+
+call    _EH_prolog
+的意思是 mov ebp, esp
+
+_CxxThrowException 是 __stdcall 8
+
+
+
+
+

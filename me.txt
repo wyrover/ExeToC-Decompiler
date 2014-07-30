@@ -1,0 +1,16 @@
+ExeToC Decompiler 
+	first release version.
+
+http://sourceforge.net/projects/exetoc
+
+How to compile:
+
+Compile with Microsoft Visual C++ 6.0
+load and build:
+	exe2c\dll\exe2c.dsw
+	exe2c_gui\exe2c_gui.dsw
+	
+
+LiuTaoTao 
+bookaa@rorsoft.com
+2005.5.24

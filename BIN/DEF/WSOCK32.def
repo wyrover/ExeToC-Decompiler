@@ -1,0 +1,78 @@
+LIBRARY     WSOCK32.DLL
+
+EXPORTS
+    accept                         @1   ; accept
+    bind                           @2   ; bind
+    closesocket                    @3   ; closesocket
+    connect                        @4   ; connect
+    getpeername                    @5   ; getpeername
+    getsockname                    @6   ; getsockname
+    getsockopt                     @7   ; getsockopt
+    htonl                          @8   ; htonl
+    htons                          @9   ; htons
+    inet_addr                      @10  ; inet_addr
+    inet_ntoa                      @11  ; inet_ntoa
+    ioctlsocket                    @12  ; ioctlsocket
+    listen                         @13  ; listen
+    ntohl                          @14  ; ntohl
+    ntohs                          @15  ; ntohs
+    recv                           @16  ; recv
+    recvfrom                       @17  ; recvfrom
+    select                         @18  ; select
+    send                           @19  ; send
+    sendto                         @20  ; sendto
+    setsockopt                     @21  ; setsockopt
+    shutdown                       @22  ; shutdown
+    socket                         @23  ; socket
+    MigrateWinsockConfiguration    @24  ; MigrateWinsockConfiguration
+    gethostbyaddr                  @51  ; gethostbyaddr
+    gethostbyname                  @52  ; gethostbyname
+    getprotobyname                 @53  ; getprotobyname
+    getprotobynumber               @54  ; getprotobynumber
+    getservbyname                  @55  ; getservbyname
+    getservbyport                  @56  ; getservbyport
+    gethostname                    @57  ; gethostname
+    WSAAsyncSelect                 @101 ; WSAAsyncSelect
+    WSAAsyncGetHostByAddr          @102 ; WSAAsyncGetHostByAddr
+    WSAAsyncGetHostByName          @103 ; WSAAsyncGetHostByName
+    WSAAsyncGetProtoByNumber       @104 ; WSAAsyncGetProtoByNumber
+    WSAAsyncGetProtoByName         @105 ; WSAAsyncGetProtoByName
+    WSAAsyncGetServByPort          @106 ; WSAAsyncGetServByPort
+    WSAAsyncGetServByName          @107 ; WSAAsyncGetServByName
+    WSACancelAsyncRequest          @108 ; WSACancelAsyncRequest
+    WSASetBlockingHook             @109 ; WSASetBlockingHook
+    WSAUnhookBlockingHook          @110 ; WSAUnhookBlockingHook
+    WSAGetLastError                @111 ; WSAGetLastError
+    WSASetLastError                @112 ; WSASetLastError
+    WSACancelBlockingCall          @113 ; WSACancelBlockingCall
+    WSAIsBlocking                  @114 ; WSAIsBlocking
+    WSAStartup                     @115 ; WSAStartup
+    WSACleanup                     @116 ; WSACleanup
+    __WSAFDIsSet                   @151 ; __WSAFDIsSet
+    WEP                            @500 ; WEP
+    WSApSetPostRoutine             @1000; WSApSetPostRoutine
+    inet_network                   @1100; inet_network
+    getnetbyname                   @1101; getnetbyname
+    rcmd                           @1102; rcmd
+    rexec                          @1103; rexec
+    rresvport                      @1104; rresvport
+    sethostname                    @1105; sethostname
+    dn_expand                      @1106; dn_expand
+    WSARecvEx                      @1107; WSARecvEx
+    s_perror                       @1108; s_perror
+    GetAddressByNameA              @1109; GetAddressByNameA
+    GetAddressByNameW              @1110; GetAddressByNameW
+    EnumProtocolsA                 @1111; EnumProtocolsA
+    EnumProtocolsW                 @1112; EnumProtocolsW
+    GetTypeByNameA                 @1113; GetTypeByNameA
+    GetTypeByNameW                 @1114; GetTypeByNameW
+    GetNameByTypeA                 @1115; GetNameByTypeA
+    GetNameByTypeW                 @1116; GetNameByTypeW
+    SetServiceA                    @1117; SetServiceA
+    SetServiceW                    @1118; SetServiceW
+    GetServiceA                    @1119; GetServiceA
+    GetServiceW                    @1120; GetServiceW
+    NPLoadNameSpaces               @1130; NPLoadNameSpaces
+    TransmitFile                   @1140; TransmitFile
+    AcceptEx                       @1141; AcceptEx
+    GetAcceptExSockaddrs           @1142; GetAcceptExSockaddrs

@@ -1,0 +1,7 @@
+; exe2c.def : Declares the module parameters for the DLL.
+
+LIBRARY      "exe2c"
+DESCRIPTION  'exe2c Windows Dynamic Link Library'
+
+EXPORTS
+    ; Explicit exports can go here
